@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# macOS
+.DS_Store
+
+# Environment variables / secrets
+.env
+
+# Generated/cache files
+*.pkl
+*.pickle
+.cache/
+
+# IDE
+.vscode/
+.idea/
