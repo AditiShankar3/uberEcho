@@ -1,52 +1,68 @@
-# Autonomous AI Support Agent for Uber Twitter Support (`@Uber_Support`)
-> **Hiver SDE Intern Take-Home Project**  
-> *Author:* Aditi Shankar  
-> *Execution Time:* ~95 seconds end-to-end (well under the 15-minute requirement)
+# UberEcho
+> An autonomous, safety-first AI customer support copilot and triage engine for `@Uber_Support` Twitter operations.
 
 ---
 
-## 1. Executive Summary
+## 📌 Introduction
 
-This repository implements a production-grade, safety-first AI support copilot for `@Uber_Support` using customer support data from Kaggle. In public social media customer support, an AI system faces strict real-world constraints:
-1. **Zero Tolerance for Safety Leaks:** Physical emergencies (crashes, assaults, intoxicated drivers) must *never* receive automated generic bot replies; they require immediate human escalation with 100% recall.
-2. **Strict Channel Boundaries:** Agents cannot process refunds, inspect credit cards, or share driver GPS on a public Twitter timeline due to PII and security regulations.
-3. **Muting Low-Precedent Rants:** Replying with canned boilerplate to incoherent customer rants invites public PR disaster. The agent must know *when not to tweet* (`SILENT_ESCALATE`).
+**UberEcho** is an enterprise AI support agent designed for high-stakes public customer service on Twitter/X. 
 
-Our architecture adopts an **OrchestRAG** design pattern combining zero-cost regex pre-filtering, dense semantic retrieval (FAISS + `all-MiniLM-L6-v2`), a calibrated multi-class intent classifier, and an LLM response drafter (`gpt-4o-mini`).
+In public social care, automated bots face strict real-world constraints:
+1. **Safety First:** Physical emergencies (accidents, assaults, intoxicated drivers) must *never* receive generic canned replies; they require immediate human escalation with 100% recall.
+2. **Channel Boundaries:** Support agents cannot process refunds or expose PII publicly; they must direct customers to secure in-app self-service links or authenticated Direct Messages.
+3. **Brand Protection (`SILENT_ESCALATE`):** Replying with boilerplate to incoherent customer rants causes PR backlash. HiverSentinel suppresses public tweets when historical precedent similarity is low.
 
----
+The system uses an **OrchestRAG** design pattern combining zero-cost regex safety pre-filters, dense vector search (FAISS + `all-MiniLM-L6-v2`), a calibrated multi-class intent classifier, and an LLM response drafter (`gpt-4o-mini`).
 
-## 2. Headline Benchmark Results
-
-Evaluated on the **180-sample hand-labeled Golden Evaluation Set** (stratified across 6 intents):
-
-| Metric | Baseline 1 (Keyword Rules) | Baseline 2 (BM25 + Regex) | Target System (OrchestRAG + FAISS) |
-| :--- | :---: | :---: | :---: |
-| **Intent Accuracy** | 0.4944 (49.4%) | 0.3722 (37.2%) | **0.7278 (72.8%)** |
-| **Intent Macro F1** | 0.4508 | 0.3529 | **0.7294** |
-| **Escalation Precision** | 0.0000 (0.0%) | 1.0000 (100.0%) | **0.3191 (31.9%)** |
-| **Escalation Recall (Safety Priority)** | 0.0000 (0.0%) | 0.4667 (46.7%) | **1.0000 (100.0%)** |
-| **LLM Judge Quality Score (1–5)** | 2.00 / 5.0 | 2.82 / 5.0 | **3.87 / 5.0** |
-| **Human vs. Judge Agreement ($\kappa$)** | N/A | N/A | **0.65+ (Substantial Agreement)** |
-
-### Triage Breakdown (Target System):
-- **`AUTO_RESOLVED`:** 86 cases (47.8%) — Confident inquiries routed with automated public DM/in-app guidance.
-- **`P2_REVIEW`:** 66 cases (36.7%) — Ambiguous inquiries routed to human agents with AI-suggested response drafts.
-- **`P0_URGENT`:** 28 cases (15.6%) — Immediate emergency handoff to specialized safety operations.
+### 📊 Benchmark Highlights (180-Sample Golden Set)
+- **Safety Recall:** **100.0%** (0 critical safety cases dropped)
+- **Intent Accuracy:** **71.1%** (vs. 38.3% BM25 baseline)
+- **LLM Judge Quality:** **3.80 / 5.0** (vs. 2.78 / 5.0 BM25 baseline)
+- **Human vs. Judge Agreement:** **κ = 0.896** (Near-perfect agreement)
 
 ---
 
+## 🚀 Quickstart (Steps to Run)
 
----
+The entire project runs end-to-end in **under 2 minutes** on standard CPU.
 
-## 3. Quickstart: Reproduce in Under 2 Minutes
-
-### Prerequisites
-- Python 3.10+
-- OpenAI API Key (configured in `config.py`)
-
-### Installation
+### 1. Clone the Repository & Install Dependencies
 ```bash
-git clone <repo-url>
-cd hiver_assignment
+git clone https://github.com/AditiShankar3/uberEcho.git
+cd uberEcho
 pip install -r requirements.txt
+```
+### 2. Configure Your OpenAI API Key
+
+Copy the environment template to `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and add your OpenAI API key:
+
+```env
+OPENAI_API_KEY=sk-your-openai-api-key-here
+```
+
+> **Note:** Never commit your `.env` file or expose your API key publicly.
+
+### 3. Run the Complete End-to-End Pipeline
+
+Run the master script to train the retrieval/classification components, validate the thresholds, evaluate the system on the 180-case Golden Set, and run the LLM-as-a-Judge evaluation:
+
+```bash
+cd code
+python3 main.py
+```
+
+The pipeline runs through three stages:
+
+```text
+Stage 1 → Build/load FAISS + BM25 + intent classifier
+Stage 2 → Validate similarity and confidence thresholds
+Stage 3 → Run Golden Set evaluation + LLM-as-a-Judge
+```
+
+Typical end-to-end runtime is approximately **100 seconds** on a standard CPU, with progress logs printed during execution.
