@@ -12,7 +12,7 @@ In public social care, automated bots face strict real-world constraints:
 2. **Channel Boundaries:** Support agents cannot process refunds or expose PII publicly; they must direct customers to secure in-app self-service links or authenticated Direct Messages.
 3. **Brand Protection (`SILENT_ESCALATE`):** Replying with boilerplate to incoherent customer rants causes PR backlash. HiverSentinel suppresses public tweets when historical precedent similarity is low.
 
-The system uses an **OrchestRAG** design pattern combining zero-cost regex safety pre-filters, dense vector search (FAISS + `all-MiniLM-L6-v2`), a calibrated multi-class intent classifier, and an LLM response drafter (`gpt-4o-mini`).
+The system uses an **OrchestRAG** (an open-source project by [thorOdinson16/OrchestRAG](https://github.com/thorOdinson16/OrchestRAG)) design pattern combining zero-cost regex safety pre-filters, dense vector search (FAISS + `all-MiniLM-L6-v2`), a calibrated multi-class intent classifier, and an LLM response drafter (`gpt-4o-mini`).
 
 ### 📊 Benchmark Highlights (180-Sample Golden Set)
 - **Safety Recall:** **100.0%** (0 critical safety cases dropped)
