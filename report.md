@@ -1,11 +1,3 @@
-
----
-
-### Deliverable 2: Copy-Paste for `REPORT.md`
-
-Create **`REPORT.md`** with the following content:
-
-```markdown
 # Comprehensive Engineering Report: Autonomous AI Support Agent for Uber Twitter Support
 
 **Author:** Aditi Shankar  
